@@ -1,6 +1,8 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "world.hpp"
+#include <iostream>
 
 class Game
 {
@@ -14,4 +16,6 @@ private:
     sf::RenderWindow window;
 
     sf::Clock dtClock;
+
+    World world;
 };
