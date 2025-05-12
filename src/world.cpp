@@ -11,58 +11,56 @@ void World::create(sf::RenderWindow& window)
 {
     this->window = &window;
 
-    srand(time(0));
+    int gridSize = 1000;
 
-    for (int i = 0; i < grid.size(); i++) {
-        for (int j = 0; j < grid[i].size(); j++) {
-            grid[i][j] = rand() % 4;
+    grid.resize(gridSize);
 
-            vertices[(i * grid[i].size() * 6 + j * 6)].position = {(float)j * 10, (float)i * 10};
-            vertices[(i * grid[i].size() * 6 + j * 6) + 1].position = {(float)j * 10 + 10, (float)i * 10};
-            vertices[(i * grid[i].size() * 6 + j * 6) + 2].position = {(float)j * 10, (float)i * 10 + 10};
-            vertices[(i * grid[i].size() * 6 + j * 6) + 3].position = {(float)j * 10, (float)i * 10 + 10};
-            vertices[(i * grid[i].size() * 6 + j * 6) + 4].position = {(float)j * 10 + 10, (float)i * 10};
-            vertices[(i * grid[i].size() * 6 + j * 6) + 5].position = {(float)j * 10 + 10, (float)i * 10 + 10};
+    for (int i = 0; i < grid.size(); i++)
+    {
+        grid[i].resize(gridSize);
 
-            switch(grid[i][j]) {
-                case 0:
-                    vertices[(i * grid[i].size() * 6 + j * 6)].color = sf::Color::Black;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 1].color = sf::Color::Black;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 2].color = sf::Color::Black;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 3].color = sf::Color::Black;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 4].color = sf::Color::Black;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 5].color = sf::Color::Black;
-                    break;
-                case 1:
-                    vertices[(i * grid[i].size() * 6 + j * 6)].color = sf::Color::Red;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 1].color = sf::Color::Red;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 2].color = sf::Color::Red;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 3].color = sf::Color::Red;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 4].color = sf::Color::Red;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 5].color = sf::Color::Red;
-                    break;
-                case 2:
-                    vertices[(i * grid[i].size() * 6 + j * 6)].color = sf::Color::Green;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 1].color = sf::Color::Green;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 2].color = sf::Color::Green;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 3].color = sf::Color::Green;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 4].color = sf::Color::Green;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 5].color = sf::Color::Green;
-                    break;
-                case 3:
-                    vertices[(i * grid[i].size() * 6 + j * 6)].color = sf::Color::Blue;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 1].color = sf::Color::Blue;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 2].color = sf::Color::Blue;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 3].color = sf::Color::Blue;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 4].color = sf::Color::Blue;
-                    vertices[(i * grid[i].size() * 6 + j * 6) + 5].color = sf::Color::Blue;
-                    break;
-            }
+        for (int j = 0; j < grid[i].size(); j++)
+        {
+            grid[i][j] = nullptr;
         }
     }
+
+    cellManager.create(&grid, &vertices);
+
+    cellManager.cellSize = 1000 / grid.size();
 }
 
 void World::update()
 {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift)) {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+            createCellFromClick();
+        }
+    }
+
     window->draw(&vertices[0], vertices.size(), sf::PrimitiveType::Triangles);
+}
+
+void World::createCellFromClick()
+{
+    sf::Vector2i mouseGridPos = getMouseGridPosition();
+
+    if (mouseGridPos.x > 0 && mouseGridPos.x < grid[0].size() && mouseGridPos.y > 0 && mouseGridPos.y < grid.size())
+    {
+        sf::Vector2f cellPosition = {(float)(mouseGridPos.x * cellManager.cellSize), (float)(mouseGridPos.y * cellManager.cellSize)};
+    
+        createCell(mouseGridPos, cellPosition);
+    }
+}
+
+void World::createCell(sf::Vector2i gridPos, sf::Vector2f cellPosition)
+{
+    grid[gridPos.y][gridPos.x] = std::unique_ptr<Cell> (new Cell(&cellManager, cellPosition)).get();
+}
+
+sf::Vector2i World::getMouseGridPosition()
+{
+    sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+
+    return {(int)((mousePos.x - (mousePos.x % cellManager.cellSize)) / cellManager.cellSize), (int)((mousePos.y - (mousePos.y % cellManager.cellSize)) / cellManager.cellSize)};
 }

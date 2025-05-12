@@ -1,11 +1,10 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include <array>
-
-#include <random>
-#include <time.h>
-#include <iostream>
+#include <vector>
+#include <memory>
+#include "cell_manager.hpp"
+#include "cell.hpp"
 
 class World
 {
@@ -17,10 +16,20 @@ public:
     void create(sf::RenderWindow& window);
 
     void update();
-private:
-    std::array<std::array<int, 100>, 100> grid;
 
+    sf::Vector2i getMouseGridPosition();
+    
+    void createCellFromClick();
+private:
     sf::RenderWindow* window;
 
-    std::array<sf::Vertex, 60000> vertices;
+    std::vector<std::vector<Cell*>> grid;
+
+    std::vector<sf::Vertex> vertices;
+
+    std::vector<Cell*> cells;
+
+    CellManager cellManager;
+
+    void createCell(sf::Vector2i gridPos, sf::Vector2f cellPosition);
 };

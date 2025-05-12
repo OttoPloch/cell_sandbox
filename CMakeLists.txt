@@ -12,6 +12,14 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(app src/main.cpp src/getPaths.cpp src/game.cpp src/world.cpp)
+add_executable(app
+src/main.cpp
+src/getPaths.cpp
+src/game.cpp
+src/world.cpp
+src/cell.cpp
+src/cell_manager.cpp
+)
+
 target_compile_features(app PRIVATE cxx_std_17)
 target_link_libraries(app PRIVATE SFML::Graphics)

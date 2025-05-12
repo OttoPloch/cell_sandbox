@@ -5,7 +5,7 @@ Game::Game() {}
 void Game::start()
 {
     window = sf::RenderWindow(sf::VideoMode({1000, 1000}), "Sandbox");
-    //window.setFramerateLimit(300);
+    window.setFramerateLimit(300);
 
     dtClock.start();
 
@@ -25,6 +25,12 @@ void Game::run()
             if (event->is<sf::Event::Closed>())
             {
                 window.close();
+            }
+            else if (const auto* buttonClicked = event->getIf<sf::Event::MouseButtonPressed>())
+            {
+                if (buttonClicked->button == sf::Mouse::Button::Left) {
+                    world.createCellFromClick();
+                }
             }
         }
 
