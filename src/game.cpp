@@ -16,6 +16,8 @@ void Game::start()
 
 void Game::run()
 {
+    float ticksToProcess = 0.f;
+
     while (window.isOpen())
     {
         float dt = dtClock.restart().asSeconds();
@@ -28,13 +30,30 @@ void Game::run()
             }
             else if (const auto* buttonClicked = event->getIf<sf::Event::MouseButtonPressed>())
             {
-                if (buttonClicked->button == sf::Mouse::Button::Left) {
-                    world.createCellFromClick();
+                if (window.hasFocus())
+                {
+                    if (buttonClicked->button == sf::Mouse::Button::Left)
+                    {
+                        world.createCellFromClick();
+                    }
+                    if (buttonClicked->button == sf::Mouse::Button::Right)
+                    {
+                        world.step();
+                    }
                 }
             }
         }
 
-        std::cout << "FPS: " << 1.f / dt << '\n';
+        //std::cout << "FPS: " << 1.f / dt << '\n';
+
+        ticksToProcess += (dt * 1000) / 50;
+
+        while (ticksToProcess >= 1.f)
+        {
+            world.step();
+
+            ticksToProcess -= 1.f;
+        }
 
         window.clear();
 

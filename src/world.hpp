@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <memory>
+#include <iostream>
 #include "cell_manager.hpp"
 #include "cell.hpp"
 
@@ -17,13 +18,17 @@ public:
 
     void update();
 
+    void step();
+
     sf::Vector2i getMouseGridPosition();
     
     void createCellFromClick();
 private:
     sf::RenderWindow* window;
 
-    std::vector<std::vector<Cell*>> grid;
+    std::vector<std::vector<std::shared_ptr<Cell>>> grid;
+
+    std::vector<std::vector<std::shared_ptr<Cell>>> nextGrid;
 
     std::vector<sf::Vertex> vertices;
 

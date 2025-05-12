@@ -11,21 +11,18 @@ void World::create(sf::RenderWindow& window)
 {
     this->window = &window;
 
-    int gridSize = 1000;
+    int gridSize = 100;
 
     grid.resize(gridSize);
+    nextGrid.resize(gridSize);
 
     for (int i = 0; i < grid.size(); i++)
     {
         grid[i].resize(gridSize);
-
-        for (int j = 0; j < grid[i].size(); j++)
-        {
-            grid[i][j] = nullptr;
-        }
+        nextGrid[i].resize(gridSize);
     }
 
-    cellManager.create(&grid, &vertices);
+    cellManager.create(&grid, &nextGrid, &vertices);
 
     cellManager.cellSize = 1000 / grid.size();
 }
@@ -41,21 +38,40 @@ void World::update()
     window->draw(&vertices[0], vertices.size(), sf::PrimitiveType::Triangles);
 }
 
+void World::step()
+{
+    for (int i = 0; i < cells.size(); i++) {
+        cells[i]->step();
+    }
+
+    grid = nextGrid;
+    
+    for (int i = 0; i < nextGrid.size(); i++)
+    {
+        std::fill(nextGrid[i].begin(), nextGrid[i].end(), nullptr);
+    }
+}
+
 void World::createCellFromClick()
 {
     sf::Vector2i mouseGridPos = getMouseGridPosition();
 
-    if (mouseGridPos.x > 0 && mouseGridPos.x < grid[0].size() && mouseGridPos.y > 0 && mouseGridPos.y < grid.size())
+    if (mouseGridPos.x >= 0 && mouseGridPos.x < grid[0].size() && mouseGridPos.y >= 0 && mouseGridPos.y < grid.size())
     {
-        sf::Vector2f cellPosition = {(float)(mouseGridPos.x * cellManager.cellSize), (float)(mouseGridPos.y * cellManager.cellSize)};
-    
-        createCell(mouseGridPos, cellPosition);
+        if (grid[mouseGridPos.y][mouseGridPos.x] == nullptr)
+        {
+            sf::Vector2f cellPosition = {(float)(mouseGridPos.x * cellManager.cellSize), (float)(mouseGridPos.y * cellManager.cellSize)};
+        
+            createCell(mouseGridPos, cellPosition);
+        }
     }
 }
 
 void World::createCell(sf::Vector2i gridPos, sf::Vector2f cellPosition)
 {
-    grid[gridPos.y][gridPos.x] = std::unique_ptr<Cell> (new Cell(&cellManager, cellPosition)).get();
+    grid[gridPos.y][gridPos.x] = std::make_shared<Cell>(&cellManager, cellPosition, gridPos);
+
+    cells.push_back(grid[gridPos.y][gridPos.x].get());
 }
 
 sf::Vector2i World::getMouseGridPosition()
