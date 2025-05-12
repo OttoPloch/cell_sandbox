@@ -18,6 +18,8 @@ void Game::run()
 {
     float ticksToProcess = 0.f;
 
+    float highestFrameTime = 0.f;
+
     while (window.isOpen())
     {
         float dt = dtClock.restart().asSeconds();
@@ -44,9 +46,18 @@ void Game::run()
             }
         }
 
-        //std::cout << "FPS: " << 1.f / dt << '\n';
+        float FPS = 1.f / dt;
 
-        ticksToProcess += (dt * 1000) / 50;
+        if (dt * 1000 > highestFrameTime)
+        {
+            highestFrameTime = dt * 1000;
+
+            //std::cout << highestFrameTime << "ms\n";
+        }
+
+        std::cout << "FPS: " << FPS << "; frame time: " << dt * 1000 << "ms; highest frame time: " << highestFrameTime << "ms\n";
+
+        ticksToProcess += (dt * 1000) / 20;
 
         while (ticksToProcess >= 1.f)
         {
@@ -55,7 +66,7 @@ void Game::run()
             ticksToProcess -= 1.f;
         }
 
-        window.clear();
+        window.clear(sf::Color(15, 15, 15));
 
         world.update();
         

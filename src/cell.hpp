@@ -5,7 +5,11 @@
 #include <array>
 #include <memory>
 #include <iostream>
+#include <string>
 #include "cell_manager.hpp"
+
+#include <random>
+#include <time.h>
 
 class Cell
 {
@@ -23,6 +27,10 @@ public:
     void step();
 
     sf::Vector2i getGridPos();
+
+    sf::Vector2i getLastGridPos();
+
+    sf::Vector2f getCellPosition();
 private:
     CellManager* cellManager;
 
@@ -36,9 +44,13 @@ private:
 
     sf::Vector2i gridPos;
 
+    sf::Vector2i lastGridPos;
+
     int cellSize;
 
     unsigned int verticesIndex;
+
+    std::string type;
 
     void createVertices();
 

@@ -21,10 +21,10 @@ void World::create(sf::RenderWindow& window)
         grid[i].resize(gridSize);
         nextGrid[i].resize(gridSize);
     }
-
+    
     cellManager.create(&grid, &nextGrid, &vertices);
-
-    cellManager.cellSize = 1000 / grid.size();
+    
+    cellManager.cellSize = window.getSize().y / grid.size();
 }
 
 void World::update()
@@ -40,15 +40,20 @@ void World::update()
 
 void World::step()
 {
-    for (int i = 0; i < cells.size(); i++) {
+    // updates cells
+    for (int i = 0; i < cells.size(); i++)
+    {
         cells[i]->step();
     }
 
-    grid = nextGrid;
-    
-    for (int i = 0; i < nextGrid.size(); i++)
-    {
-        std::fill(nextGrid[i].begin(), nextGrid[i].end(), nullptr);
+    // applies changes to the grid
+    for (int i = 0; i < cells.size(); i++)
+    {   
+        sf::Vector2i cellGridPos = cells[i]->getGridPos();
+        sf::Vector2i cellLastGridPos = cells[i]->getLastGridPos();
+
+        grid[cellLastGridPos.y][cellLastGridPos.x] = nullptr;
+        grid[cellGridPos.y][cellGridPos.x] = std::move(nextGrid[cellGridPos.y][cellGridPos.x]);
     }
 }
 

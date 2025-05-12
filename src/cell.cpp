@@ -21,6 +21,8 @@ void Cell::create(CellManager* cellManager, sf::Vector2f cellPosition, sf::Vecto
 
     this->gridPos = gridPos;
 
+    lastGridPos = gridPos;
+
     this->cellSize = cellManager->cellSize;
 
     createVertices();
@@ -34,9 +36,13 @@ void Cell::createVertices()
 
     setVerticesPositions(newVertices);
 
+    srand(time(0));
+
+    sf::Color myColor = sf::Color(rand() % 256, rand() % 256, rand() % 256);
+
     for (int i = 0; i < 6; i++)
     {
-        newVertices[i].color = sf::Color::Red;
+        newVertices[i].color = myColor;
     }
 
     vertices->insert(vertices->end(), &newVertices[0], &newVertices[newVertices.size()]);
@@ -64,7 +70,7 @@ void Cell::changeVerticesPositions(std::array<sf::Vertex*, 6>& verticesToChange)
 
 void Cell::moveCell(sf::Vector2i newGridPos)
 {
-        //copies the current cell to its next spot
+    //copies the current cell to its next spot
     (*nextGrid)[newGridPos.y][newGridPos.x] = (*grid)[gridPos.y][gridPos.x];
 
     // changes this cell's position variables
@@ -88,10 +94,11 @@ void Cell::moveCell(sf::Vector2i newGridPos)
 
 void Cell::moveCell(int xChange, int yChange)
 {
-    //copies the current cell to its next spot
+    // copies cell to nextGrid
     (*nextGrid)[gridPos.y + yChange][gridPos.x + xChange] = (*grid)[gridPos.y][gridPos.x];
-
+    
     // changes this cell's position variables
+    lastGridPos = gridPos;
     gridPos = {gridPos.x + xChange, gridPos.y + yChange};
     cellPosition = {(float)(gridPos.x * cellSize), (float)(gridPos.y * cellSize)};
 
@@ -111,22 +118,38 @@ void Cell::moveCell(int xChange, int yChange)
 
 void Cell::step()
 {
-    Cell* topNeighbor;
-    Cell* bottomNeighbor;
-    Cell* leftNeighbor;
-    Cell* rightNeighbor;
+    std::shared_ptr<Cell> topNeighbor = nullptr;
+    std::shared_ptr<Cell> bottomNeighbor = nullptr;
+    std::shared_ptr<Cell> leftNeighbor = nullptr;
+    std::shared_ptr<Cell> rightNeighbor = nullptr;
 
-    (gridPos.y > 0) ? topNeighbor = (*grid)[gridPos.y - 1][gridPos.x].get() : topNeighbor = nullptr;
-    (gridPos.y < grid->size() - 1) ? bottomNeighbor = (*grid)[gridPos.y + 1][gridPos.x].get() : bottomNeighbor = nullptr;
-    (gridPos.x > 0) ? leftNeighbor = (*grid)[gridPos.y][gridPos.x - 1].get() : leftNeighbor = nullptr;
-    (gridPos.x < grid[gridPos.y].size() - 1) ? rightNeighbor = (*grid)[gridPos.y][gridPos.x + 1].get() : rightNeighbor = nullptr;
+    if (gridPos.y > 0)
+    {
+        topNeighbor = (*grid)[gridPos.y - 1][gridPos.x];
+    }
 
-    if (bottomNeighbor == nullptr && gridPos.y < grid->size() - 1)
+    if (gridPos.y < (*grid).size() - 1)
+    {
+        bottomNeighbor = (*grid)[gridPos.y + 1][gridPos.x];
+    }
+
+    if (gridPos.x > 0)
+    {
+        leftNeighbor = (*grid)[gridPos.y][gridPos.x - 1];
+    }
+
+    if (gridPos.x < (*grid)[gridPos.y].size() - 1)
+    {
+        rightNeighbor = (*grid)[gridPos.y][gridPos.x + 1];
+    }
+
+    if (bottomNeighbor == nullptr && gridPos.y < (*grid).size() - 1)
     {
         moveCell(0, 1);
     }
-    else
+    else 
     {
+        lastGridPos = gridPos;
         (*nextGrid)[gridPos.y][gridPos.x] = (*grid)[gridPos.y][gridPos.x];
     }
 }
@@ -134,4 +157,14 @@ void Cell::step()
 sf::Vector2i Cell::getGridPos()
 {
     return gridPos;
+}
+
+sf::Vector2i Cell::getLastGridPos()
+{
+    return lastGridPos;
+}
+
+sf::Vector2f Cell::getCellPosition()
+{
+    return cellPosition;
 }
