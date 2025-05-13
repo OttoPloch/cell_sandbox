@@ -18,4 +18,6 @@ void CellManager::create(std::vector<std::vector<std::shared_ptr<Cell>>>* grid, 
     this->vertices = vertices;
 
     cellSize = 10;
+
+    cellColorVariance = 10;
 }

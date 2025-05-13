@@ -23,4 +23,6 @@ public:
     std::vector<sf::Vertex>* vertices;
 
     int cellSize;
+
+    int cellColorVariance;
 };

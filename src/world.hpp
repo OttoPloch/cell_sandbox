@@ -21,8 +21,12 @@ public:
     void step();
 
     sf::Vector2i getMouseGridPosition();
+
+    std::vector<sf::Vector2i> getMouseGridPositionsFromRadius(int radius);
     
     void createCellFromClick();
+
+    void createCellCircleFromClick(int radius);
 private:
     sf::RenderWindow* window;
 

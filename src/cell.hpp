@@ -6,19 +6,18 @@
 #include <memory>
 #include <iostream>
 #include <string>
-#include "cell_manager.hpp"
-
 #include <random>
-#include <time.h>
+#include "cell_manager.hpp"
+#include "get_random_number.hpp"
 
 class Cell
 {
 public:
     Cell();
 
-    Cell(CellManager* cellManager, sf::Vector2f cellPosition, sf::Vector2i gridPos);
+    Cell(CellManager* cellManager, sf::Vector2f cellPosition, sf::Vector2i gridPos, std::string type);
 
-    void create(CellManager* cellManager, sf::Vector2f cellPosition, sf::Vector2i gridPos);
+    void create(CellManager* cellManager, sf::Vector2f cellPosition, sf::Vector2i gridPos, std::string type);
 
     void moveCell(sf::Vector2i newGridPos);
 
@@ -31,6 +30,8 @@ public:
     sf::Vector2i getLastGridPos();
 
     sf::Vector2f getCellPosition();
+
+    bool isFalling();
 private:
     CellManager* cellManager;
 
@@ -45,6 +46,8 @@ private:
     sf::Vector2i gridPos;
 
     sf::Vector2i lastGridPos;
+
+    bool falling;
 
     int cellSize;
 
