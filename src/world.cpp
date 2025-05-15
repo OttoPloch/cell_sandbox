@@ -11,8 +11,8 @@ void World::create(sf::RenderWindow& window)
 {
     this->window = &window;
 
-    int gridLength = 250;
-    int gridHeight = 250;
+    int gridLength = 500;
+    int gridHeight = 500;
 
     grid.resize(gridHeight);
     nextGrid.resize(gridHeight);
@@ -73,35 +73,6 @@ void World::step()
     //     std::cout << '\n';
     // }
     // std::cout << '\n';
-
-    // for (int x = 0; x < grid[0].size(); x++)
-    // {
-    //     for (int y = grid[x].size() - 1; y >= 0; y--)
-    //     {
-    //         if (grid[y][x] != nullptr)
-    //         {
-    //             bool printThoughts = false;
-
-    //             if (getMouseGridPosition() == grid[y][x]->getGridPos())
-    //             {
-    //                 printThoughts = true;
-    //             }
-
-    //             grid[y][x]->step(printThoughts);
-    //         }
-    //     }
-    // }    
-    
-    // for (int x = 0; x < nextGrid[0].size(); x++)
-    // {
-    //     for (int y = nextGrid[x].size() - 1; y >= 0; y--)
-    //     {
-    //         if (grid[y][x] != nullptr || nextGrid[y][x] != nullptr)
-    //         {
-    //             grid[y][x] = std::move(nextGrid[y][x]);
-    //         }
-    //     }
-    // }
 
     for (int y = grid.size() - 1; y >= 0; y--)
     {

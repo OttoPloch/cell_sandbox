@@ -210,113 +210,11 @@ void Cell::step(bool printThoughts)
 
     if (type == "sand")
     {
-    //     bool stayStill = false;
-
-    //     if (gridPos.y < (*grid).size() - 1)
-    //     {
-    //         if (bottomNeighbor == nullptr)
-    //         {
-    //             if ((*nextGrid)[gridPos.y + 1][gridPos.x].get() == nullptr)
-    //             {
-    //                 //std::cout << gridPos.x << ", " << gridPos.y << " is going down...\n";
-    //                 moveCell(0, 1);
-    //                 falling = true;
-    //             }
-    //             else
-    //             {
-    //                 stayStill = true;
-    //                 falling = false;
-    //             }
-    //         }
-    //         else if (bottomNeighbor.get()->isFalling())
-    //         {
-    //             //std::cout << gridPos.x << ", " << gridPos.y << " is waiting...\n";
-    //             stayStill = true;
-    //             falling = true;
-    //         }
-    //         else if (bottomNeighbor.get()->getType() == "water")
-    //         {
-    //             bottomNeighbor.get()->moveCell(0, -1);
-    //             moveCell(0, 1);
-    //         }
-    //         else if (bottomLeftNeighbor == nullptr && gridPos.x > 0 && (*nextGrid)[gridPos.y + 1][gridPos.x - 1].get() == nullptr)
-    //         {
-    //             //std::cout << gridPos.x << ", " << gridPos.y << " is going down-left...\n";
-    //             moveCell(-1, 1);
-    //             falling = true;
-    //         }
-    //         else if (bottomRightNeighbor == nullptr && gridPos.x < (*grid)[gridPos.y].size() - 1 && (*nextGrid)[gridPos.y + 1][gridPos.x + 1].get() == nullptr)
-    //         {
-    //             //std::cout << gridPos.x << ", " << gridPos.y << " is going down-right...\n";
-    //             moveCell(1, 1);
-    //             falling = true;
-    //         }
-    //         else
-    //         {
-    //             stayStill = true;
-    //             falling = false;
-    //         }
-    //     }
-    //     else 
-    //     {
-    //         stayStill = true;
-    //         falling = false;
-    //     }
-
-    //     if (stayStill)
-    //     {
-    //         //std::cout << gridPos.x << ", " << gridPos.y << " is not falling...\n";
-    //         lastGridPos = gridPos;
-    //         (*nextGrid)[gridPos.y][gridPos.x] = (*grid)[gridPos.y][gridPos.x];
-    //     }
+        (*nextGrid)[gridPos.y][gridPos.x] = (*grid)[gridPos.y][gridPos.x];
     }
     else if (type == "water")
     {
-        bool stayStill = false;
-        
-        if (gridPos.y < gridBottom)
-        {
-            if (nextBottomNeighbor == nullptr)
-            {
-                moveCell(0, 1);
-                falling = true;
-            }
-            else if (gridPos.x > gridLeft && nextBottomLeftNeighbor == nullptr)
-            {
-                moveCell(-1, 1);
-                falling = true;
-            }
-            else if (gridPos.x < gridRight && nextBottomRightNeighbor == nullptr)
-            {
-                moveCell(1, 1);
-                falling = true;
-            }
-            else if (gridPos.x < gridRight && nextLeftNeighbor == nullptr)
-            {
-                moveCell(-1, 0);
-                falling = true;
-            }
-            else if (gridPos.x > gridLeft && nextLeftNeighbor == nullptr)
-            {
-                moveCell(1, 0);
-                falling = true;
-            }
-            else 
-            {
-                stayStill = true;
-                falling = false;
-            }
-        }
-        else
-        {
-            stayStill = true;
-            falling = false;
-        }
-
-        if (stayStill)
-        {
-            (*nextGrid)[gridPos.y][gridPos.x] = (*grid)[gridPos.y][gridPos.x];
-        }
+        (*nextGrid)[gridPos.y][gridPos.x] = (*grid)[gridPos.y][gridPos.x];
     }
 
     // if (type == "sand")
