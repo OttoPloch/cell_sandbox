@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <iostream>
+#include <tgmath.h>
 #include "cell_manager.hpp"
 #include "cell.hpp"
 
@@ -27,6 +28,14 @@ public:
     void createCellFromClick();
 
     void createCellCircleFromClick(int radius);
+
+    int getCellCount();
+
+    int getCellsCreated();
+
+    void cycleTool();
+
+    void setTool(std::string tool);
 private:
     sf::RenderWindow* window;
 
@@ -36,9 +45,11 @@ private:
 
     std::vector<sf::Vertex> vertices;
 
-    std::vector<Cell*> cells;
-
     CellManager cellManager;
 
-    void createCell(sf::Vector2i gridPos, sf::Vector2f cellPosition);
+    std::string cellCreationType;
+
+    int cellsCreated;
+
+    void createCell(sf::Vector2i gridPos, sf::Vector2f cellPosition, std::string type);
 };

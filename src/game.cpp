@@ -11,6 +11,8 @@ void Game::start()
 
     world.create(window);
 
+    paused = true;
+
     run();
 }
 
@@ -44,6 +46,20 @@ void Game::run()
                     }
                 }
             }
+            else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+            {
+                if (window.hasFocus())
+                {
+                    if (keyPressed->code == sf::Keyboard::Key::Q)
+                    {
+                        world.cycleTool();
+                    }
+                    if (keyPressed->code == sf::Keyboard::Key::Tab)
+                    {
+                        paused = !paused;
+                    }
+                }
+            }
         }
 
         float FPS = 1.f / dt;
@@ -55,15 +71,20 @@ void Game::run()
             //std::cout << highestFrameTime << "ms\n";
         }
 
-        std::cout << "FPS: " << FPS << "; frame time: " << dt * 1000 << "ms; highest frame time: " << highestFrameTime << "ms\n";
-
-        ticksToProcess += (dt * 1000) / 20;
-
-        while (ticksToProcess >= 1.f)
+        if (!paused)
         {
-            world.step();
+            //std::cout << "FPS: " << FPS << "; frame time: " << dt * 1000 << "ms; highest frame time: " << highestFrameTime << "ms\n";
 
-            ticksToProcess -= 1.f;
+            //std::cout << "cells created: " << world.getCellsCreated() << "; current cells: " << world.getCellCount() << '\n';
+
+            ticksToProcess += (dt * 1000) / 20;
+    
+            while (ticksToProcess >= 1.f)
+            {
+                world.step();
+    
+                ticksToProcess -= 1.f;
+            }
         }
 
         window.clear(sf::Color(15, 15, 15));

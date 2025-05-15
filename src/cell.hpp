@@ -23,15 +23,15 @@ public:
 
     void moveCell(int xChange, int yChange);
 
-    void step();
+    void step(bool printThoughts);
 
     sf::Vector2i getGridPos();
-
-    sf::Vector2i getLastGridPos();
 
     sf::Vector2f getCellPosition();
 
     bool isFalling();
+
+    std::string getType();
 private:
     CellManager* cellManager;
 
@@ -45,11 +45,9 @@ private:
 
     sf::Vector2i gridPos;
 
-    sf::Vector2i lastGridPos;
-
     bool falling;
 
-    int cellSize;
+    float cellSize;
 
     unsigned int verticesIndex;
 

@@ -22,7 +22,7 @@ public:
 
     std::vector<sf::Vertex>* vertices;
 
-    int cellSize;
+    float cellSize;
 
     int cellColorVariance;
 };

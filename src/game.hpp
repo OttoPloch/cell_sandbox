@@ -18,4 +18,6 @@ private:
     sf::Clock dtClock;
 
     World world;
+
+    bool paused;
 };

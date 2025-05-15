@@ -11,24 +11,29 @@ void World::create(sf::RenderWindow& window)
 {
     this->window = &window;
 
-    int gridSize = 500;
+    int gridLength = 250;
+    int gridHeight = 250;
 
-    grid.resize(gridSize);
-    nextGrid.resize(gridSize);
+    grid.resize(gridHeight);
+    nextGrid.resize(gridHeight);
 
     for (int i = 0; i < grid.size(); i++)
     {
-        grid[i].resize(gridSize);
-        nextGrid[i].resize(gridSize);
+        grid[i].resize(gridLength);
+        nextGrid[i].resize(gridLength);
     }
     
     cellManager.create(&grid, &nextGrid, &vertices);
     
-    cellManager.cellSize = window.getSize().y / grid.size();
+    cellManager.cellSize = (float)window.getSize().y / (float)grid.size();
 
-    // for (int j = 0; j < gridSize; j++)
+    cellsCreated = 0;
+
+    cellCreationType = "sand";
+
+    // for (int j = 0; j < gridLength; j++)
     // {
-    //     for (int i = 0; i < 10; i++)
+    //     for (int i = 0; i < 1; i++)
     //     {
     //         createCell({j, i}, {(float)j * cellManager.cellSize, (float)i * cellManager.cellSize}, "sand");
     //     }
@@ -53,39 +58,80 @@ void World::update()
 
 void World::step()
 {
-    // updates cells
-    for (int i = 0; i < cells.size(); i++)
-    {
-        cells[i]->step();
-    }
-
-    // applies changes to the grid
-    for (int i = 0; i < cells.size(); i++)
-    {   
-        sf::Vector2i cellGridPos = cells[i]->getGridPos();
-        sf::Vector2i cellLastGridPos = cells[i]->getLastGridPos();
-
-        grid[cellLastGridPos.y][cellLastGridPos.x] = nullptr;
-        grid[cellGridPos.y][cellGridPos.x] = std::move(nextGrid[cellGridPos.y][cellGridPos.x]);
-    }
-
     // for (int i = 0; i < grid.size(); i++)
     // {
     //     for (int j = 0; j < grid[i].size(); j++)
     //     {
     //         if (grid[i][j] == nullptr)
     //         {
-    //             std::cout << "0 - ";
+    //             std::cout << "0";
     //         }
     //         else {
-    //             std::cout << "1 - ";
+    //             std::cout << "1";
     //         }
     //     }
-        
     //     std::cout << '\n';
     // }
-
     // std::cout << '\n';
+
+    // for (int x = 0; x < grid[0].size(); x++)
+    // {
+    //     for (int y = grid[x].size() - 1; y >= 0; y--)
+    //     {
+    //         if (grid[y][x] != nullptr)
+    //         {
+    //             bool printThoughts = false;
+
+    //             if (getMouseGridPosition() == grid[y][x]->getGridPos())
+    //             {
+    //                 printThoughts = true;
+    //             }
+
+    //             grid[y][x]->step(printThoughts);
+    //         }
+    //     }
+    // }    
+    
+    // for (int x = 0; x < nextGrid[0].size(); x++)
+    // {
+    //     for (int y = nextGrid[x].size() - 1; y >= 0; y--)
+    //     {
+    //         if (grid[y][x] != nullptr || nextGrid[y][x] != nullptr)
+    //         {
+    //             grid[y][x] = std::move(nextGrid[y][x]);
+    //         }
+    //     }
+    // }
+
+    for (int y = grid.size() - 1; y >= 0; y--)
+    {
+        for (int x = grid[y].size() - 1; x >= 0; x--)
+        {
+            if (grid[y][x] != nullptr)
+            {
+                bool printThoughts = false;
+
+                // if (getMouseGridPosition() == grid[y][x]->getGridPos())
+                // {
+                //     printThoughts = true;
+                // }
+
+                grid[y][x]->step(printThoughts);
+            }
+        }
+    }
+
+    for (int y = grid.size() - 1; y >= 0; y--)
+    {
+        for (int x = grid[y].size() - 1; x >= 0; x--)
+        {
+            if (grid[y][x] != nullptr || nextGrid[y][x] != nullptr)
+            {
+                grid[y][x] = std::move(nextGrid[y][x]);
+            }
+        }
+    }
+
 }
 
 void World::createCellFromClick()
@@ -98,7 +144,7 @@ void World::createCellFromClick()
         {
             sf::Vector2f cellPosition = {(float)(mouseGridPos.x * cellManager.cellSize), (float)(mouseGridPos.y * cellManager.cellSize)};
         
-            createCell(mouseGridPos, cellPosition);
+            createCell(mouseGridPos, cellPosition, cellCreationType);
         }
     }
 }
@@ -115,24 +161,24 @@ void World::createCellCircleFromClick(int radius)
             {
                 sf::Vector2f cellPosition = {(float)(cellsToMake[i].x * cellManager.cellSize), (float)(cellsToMake[i].y * cellManager.cellSize)};
             
-                createCell(cellsToMake[i], cellPosition);
+                createCell(cellsToMake[i], cellPosition, cellCreationType);
             }
         }
     }
 }
 
-void World::createCell(sf::Vector2i gridPos, sf::Vector2f cellPosition)
+void World::createCell(sf::Vector2i gridPos, sf::Vector2f cellPosition, std::string type)
 {
-    grid[gridPos.y][gridPos.x] = std::make_shared<Cell>(&cellManager, cellPosition, gridPos, "sand");
+    grid[gridPos.y][gridPos.x] = std::make_shared<Cell>(&cellManager, cellPosition, gridPos, type);
 
-    cells.push_back(grid[gridPos.y][gridPos.x].get());
+    cellsCreated++;
 }
 
 sf::Vector2i World::getMouseGridPosition()
 {
     sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
 
-    return {(int)((mousePos.x - (mousePos.x % cellManager.cellSize)) / cellManager.cellSize), (int)((mousePos.y - (mousePos.y % cellManager.cellSize)) / cellManager.cellSize)};
+    return {(int)((mousePos.x - (fmod(mousePos.x, cellManager.cellSize))) / cellManager.cellSize), (int)((mousePos.y - (fmod(mousePos.y, cellManager.cellSize))) / cellManager.cellSize)};
 }
 
 std::vector<sf::Vector2i> World::getMouseGridPositionsFromRadius(int radius)
@@ -161,4 +207,48 @@ std::vector<sf::Vector2i> World::getMouseGridPositionsFromRadius(int radius)
     }
 
     return pointsInRadius;
+}
+
+int World::getCellCount()
+{
+    int cells = 0;
+
+    for (int y = 0; y < grid.size(); y++)
+    {
+        for (int x = 0; x < grid[y].size(); x++)
+        {
+            if (grid[y][x] != nullptr)
+            {
+                cells++;
+            }
+        }
+    }
+
+    return cells;
+}
+
+int World::getCellsCreated()
+{
+    return cellsCreated;
+}
+
+void World::cycleTool()
+{
+    if (cellCreationType == "sand")
+    {
+        cellCreationType = "water";
+    }
+    else
+    {
+        cellCreationType = "sand";
+    }
+
+    std::cout << "new tool: " << cellCreationType << '\n';
+}
+
+void World::setTool(std::string tool)
+{  
+    cellCreationType = tool;
+
+    std::cout << "new tool: " << cellCreationType << '\n';
 }
