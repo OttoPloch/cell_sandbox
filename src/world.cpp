@@ -11,8 +11,8 @@ void World::create(sf::RenderWindow& window)
 {
     this->window = &window;
 
-    int gridLength = 500;
-    int gridHeight = 500;
+    int gridLength = 100;
+    int gridHeight = 100;
 
     grid.resize(gridHeight);
     nextGrid.resize(gridHeight);

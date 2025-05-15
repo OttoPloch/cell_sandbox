@@ -5,7 +5,7 @@ Game::Game() {}
 void Game::start()
 {
     window = sf::RenderWindow(sf::VideoMode({1000, 1000}), "Sandbox");
-    //window.setFramerateLimit(60);
+    window.setFramerateLimit(60);
 
     dtClock.start();
 
