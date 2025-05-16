@@ -122,6 +122,8 @@ void Cell::moveCell(sf::Vector2i newGridPos)
 
 void Cell::moveCell(int xChange, int yChange)
 {
+    std::cout << "next grid pos is " << gridPos.x + xChange << ", " << gridPos.y + yChange << '\n';
+
     // moves cell to new grid spot
     (*grid)[gridPos.y + yChange][gridPos.x + xChange] = std::move((*grid)[gridPos.y][gridPos.x]);
 
@@ -270,7 +272,7 @@ void Cell::step(bool printThoughts)
                     {
                         moveCell(1, 1);
                     }
-                    else if (bottomLeftNeighbor->getType() == "water" && bottomRightNeighbor->getType() == "water")
+                    else if (bottomLeftNeighbor->getType() == "water" && x > gridLeft && bottomRightNeighbor->getType() == "water" && x < gridRight)
                     {
                         if (getRandomInt(1) == 0)
                         {
@@ -283,11 +285,11 @@ void Cell::step(bool printThoughts)
                     }
                     else
                     {
-                        if (bottomLeftNeighbor->getType() == "water")
+                        if (bottomLeftNeighbor->getType() == "water" && x > gridLeft)
                         {
                             swap(bottomLeftNeighbor->getGridPos());
                         }
-                        else if (bottomRightNeighbor->getType() == "water")
+                        else if (bottomRightNeighbor->getType() == "water" && x < gridRight)
                         {
                             swap(bottomRightNeighbor->getGridPos());
                         }
