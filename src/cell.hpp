@@ -23,6 +23,8 @@ public:
 
     void moveCell(int xChange, int yChange);
 
+    void swap(sf::Vector2i swapPosition);
+
     void step(bool printThoughts);
 
     sf::Vector2i getGridPos();

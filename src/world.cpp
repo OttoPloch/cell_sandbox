@@ -199,6 +199,10 @@ void World::cycleTool()
     {
         cellCreationType = "water";
     }
+    else if (cellCreationType == "water")
+    {
+        cellCreationType = "wood";
+    }
     else
     {
         cellCreationType = "sand";

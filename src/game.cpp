@@ -60,7 +60,7 @@ void Game::run()
                     }
                     if (keyPressed->code == sf::Keyboard::Key::Enter)
                     {
-                        world.createCellCircleFromClick(10, 5);
+                        world.createCellCircleFromClick(30, 85);
                     }
                 }
             }
@@ -79,9 +79,9 @@ void Game::run()
         {
             //std::cout << "FPS: " << FPS << "; frame time: " << dt * 1000 << "ms; highest frame time: " << highestFrameTime << "ms\n";
 
-            std::cout << "cells created: " << world.getCellsCreated() << "; current cells: " << world.getCellCount() << '\n';
+            //std::cout << "cells created: " << world.getCellsCreated() << "; current cells: " << world.getCellCount() << '\n';
 
-            ticksToProcess += (dt * 1000) / 20;
+            ticksToProcess += (dt * 1000) / 16.666;
     
             while (ticksToProcess >= 1.f)
             {

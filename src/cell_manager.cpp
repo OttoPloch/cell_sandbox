@@ -17,5 +17,5 @@ void CellManager::create(std::vector<std::vector<std::shared_ptr<Cell>>>* grid, 
 
     cellSize = 10;
 
-    cellColorVariance = 30;
+    cellColorVariance = 10;
 }

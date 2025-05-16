@@ -46,6 +46,10 @@ void Cell::createVertices()
     {
         myColor = sf::Color(19, 94, 186);
     }
+    else if (type == "wood")
+    {
+        myColor = sf::Color(102, 69, 24);
+    }
 
     int random = getRandomInt(cellManager->cellColorVariance);
 
@@ -95,7 +99,7 @@ void Cell::changeVerticesPositions(std::array<sf::Vertex*, 6>& verticesToChange)
 
 void Cell::moveCell(sf::Vector2i newGridPos)
 {
-    // copies cell to nextGrid
+    // moves cell to new grid spot
     (*grid)[newGridPos.y][newGridPos.x] = std::move((*grid)[gridPos.y][gridPos.x]);
     
     // changes this cell's position variables
@@ -118,11 +122,38 @@ void Cell::moveCell(sf::Vector2i newGridPos)
 
 void Cell::moveCell(int xChange, int yChange)
 {
-    // copies cell to nextGrid
+    // moves cell to new grid spot
     (*grid)[gridPos.y + yChange][gridPos.x + xChange] = std::move((*grid)[gridPos.y][gridPos.x]);
 
     // changes this cell's position variables
     gridPos = {gridPos.x + xChange, gridPos.y + yChange};
+    cellPosition = {(float)(gridPos.x * cellSize), (float)(gridPos.y * cellSize)};
+
+    ////////// changes the vertices //////////
+    
+    std::array<sf::Vertex*, 6> verticesToChange;
+
+    for (int i = 0; i < verticesToChange.size(); i++)
+    {
+        verticesToChange[i] = &(*vertices)[verticesIndex + i];
+    }
+
+    changeVerticesPositions(verticesToChange);
+    
+    //////////////////////////////////////////
+}
+
+void Cell::swap(sf::Vector2i swapPosition)
+{
+    std::shared_ptr<Cell> swap = (*grid)[gridPos.y][gridPos.x];
+
+    (*grid)[swapPosition.y][swapPosition.x]->moveCell(gridPos);
+    
+    // moves cell to new grid spot
+    (*grid)[swapPosition.y][swapPosition.x] = std::move(swap);
+    
+    // changes this cell's position variables
+    gridPos = swapPosition;
     cellPosition = {(float)(gridPos.x * cellSize), (float)(gridPos.y * cellSize)};
 
     ////////// changes the vertices //////////
@@ -212,6 +243,10 @@ void Cell::step(bool printThoughts)
             {
                 moveCell(0, 1);
             }
+            else if (bottomNeighbor->getType() == "water")
+            {
+                swap(bottomNeighbor->getGridPos());
+            }
             else
             {
                 if (bottomLeftNeighbor == nullptr && x > gridLeft && bottomRightNeighbor == nullptr && x < gridRight)
@@ -235,6 +270,28 @@ void Cell::step(bool printThoughts)
                     {
                         moveCell(1, 1);
                     }
+                    else if (bottomLeftNeighbor->getType() == "water" && bottomRightNeighbor->getType() == "water")
+                    {
+                        if (getRandomInt(1) == 0)
+                        {
+                            swap(bottomLeftNeighbor->getGridPos());
+                        }
+                        else
+                        {
+                            swap(bottomRightNeighbor->getGridPos());
+                        }
+                    }
+                    else
+                    {
+                        if (bottomLeftNeighbor->getType() == "water")
+                        {
+                            swap(bottomLeftNeighbor->getGridPos());
+                        }
+                        else if (bottomRightNeighbor->getType() == "water")
+                        {
+                            swap(bottomRightNeighbor->getGridPos());
+                        }
+                    }
                 }
             }
         }
@@ -245,7 +302,68 @@ void Cell::step(bool printThoughts)
     }
     else if (type == "water")
     {
-        
+        if (y < gridBottom)
+        {
+            if (bottomNeighbor == nullptr)
+            {
+                moveCell(0, 1);
+            }
+            else
+            {
+                if (bottomLeftNeighbor == nullptr && x > gridLeft && bottomRightNeighbor == nullptr && x < gridRight)
+                {
+                    if (getRandomInt(1) == 0)
+                    {
+                        moveCell(-1, 1);
+                    }
+                    else
+                    {
+                        moveCell(1, 1);
+                    }
+                }
+                else
+                {
+                    if (bottomLeftNeighbor == nullptr && x > gridLeft)
+                    {
+                        moveCell(-1, 1);
+                    }
+                    else if (bottomRightNeighbor == nullptr && x < gridRight)
+                    {
+                        moveCell(1, 1);
+                    }
+                    else if (leftNeighbor == nullptr && x > gridLeft && rightNeighbor == nullptr && x < gridRight)
+                    {
+                        if (getRandomInt(1) == 0)
+                        {
+                            moveCell(-1, 0);
+                        }
+                        else
+                        {
+                            moveCell(1, 0);
+                        }
+                    }
+                    else
+                    {
+                        if (leftNeighbor == nullptr && x > gridLeft)
+                        {
+                            moveCell(-1, 0);
+                        }
+                        else if (rightNeighbor == nullptr && x < gridRight)
+                        {
+                            moveCell(1, 0);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            falling = false;
+        }
+    }
+    else if (type == "wood")
+    {
+
     }
 }
 
