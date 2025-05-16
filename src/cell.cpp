@@ -13,8 +13,6 @@ void Cell::create(CellManager* cellManager, sf::Vector2f cellPosition, sf::Vecto
 
     grid = cellManager->grid;
 
-    nextGrid = cellManager->nextGrid;
-
     vertices = cellManager->vertices;
 
     this->cellPosition = cellPosition;
@@ -49,9 +47,23 @@ void Cell::createVertices()
         myColor = sf::Color(19, 94, 186);
     }
 
-    myColor.r -= getRandomInt(cellManager->cellColorVariance);
-    myColor.g -= getRandomInt(cellManager->cellColorVariance);
-    myColor.b -= getRandomInt(cellManager->cellColorVariance);
+    int random = getRandomInt(cellManager->cellColorVariance);
+
+    int red = myColor.r;
+    int green = myColor.g;
+    int blue = myColor.b;
+
+    red -= random;
+    green -= random;
+    blue -= random;
+
+    if (red < 0) red = 0;
+    if (green < 0) green = 0;
+    if (blue < 0) blue = 0;
+
+    myColor.r = red;
+    myColor.g = green;
+    myColor.b = blue;
 
     for (int i = 0; i < 6; i++)
     {
@@ -84,7 +96,7 @@ void Cell::changeVerticesPositions(std::array<sf::Vertex*, 6>& verticesToChange)
 void Cell::moveCell(sf::Vector2i newGridPos)
 {
     // copies cell to nextGrid
-    (*nextGrid)[newGridPos.y][newGridPos.x] = (*grid)[gridPos.y][gridPos.x];
+    (*grid)[newGridPos.y][newGridPos.x] = std::move((*grid)[gridPos.y][gridPos.x]);
     
     // changes this cell's position variables
     gridPos = newGridPos;
@@ -107,8 +119,8 @@ void Cell::moveCell(sf::Vector2i newGridPos)
 void Cell::moveCell(int xChange, int yChange)
 {
     // copies cell to nextGrid
-    (*nextGrid)[gridPos.y + yChange][gridPos.x + xChange] = (*grid)[gridPos.y][gridPos.x];
-    
+    (*grid)[gridPos.y + yChange][gridPos.x + xChange] = std::move((*grid)[gridPos.y][gridPos.x]);
+
     // changes this cell's position variables
     gridPos = {gridPos.x + xChange, gridPos.y + yChange};
     cellPosition = {(float)(gridPos.x * cellSize), (float)(gridPos.y * cellSize)};
@@ -140,65 +152,46 @@ void Cell::step(bool printThoughts)
     std::shared_ptr<Cell> leftNeighbor = nullptr;
     std::shared_ptr<Cell> rightNeighbor = nullptr;
 
-    std::shared_ptr<Cell> nextTopNeighbor = nullptr;
-    std::shared_ptr<Cell> nextTopLeftNeighbor = nullptr;
-    std::shared_ptr<Cell> nextTopRightNeighbor = nullptr;
-
-    std::shared_ptr<Cell> nextBottomNeighbor = nullptr;
-    std::shared_ptr<Cell> nextBottomLeftNeighbor = nullptr;
-    std::shared_ptr<Cell> nextBottomRightNeighbor = nullptr;
-
-    std::shared_ptr<Cell> nextLeftNeighbor = nullptr;
-    std::shared_ptr<Cell> nextRightNeighbor = nullptr;
-
     ////////// assigning neighbors //////////
 
     if (gridPos.y > 0)
     {
         topNeighbor = (*grid)[gridPos.y - 1][gridPos.x];
-        nextTopNeighbor = (*nextGrid)[gridPos.y - 1][gridPos.x];
 
         if (gridPos.x > 0)
         {
             topLeftNeighbor = (*grid)[gridPos.y - 1][gridPos.x - 1];
-            nextTopLeftNeighbor = (*nextGrid)[gridPos.y - 1][gridPos.x - 1];
         }
 
         if (gridPos.x < (*grid)[gridPos.y].size() - 1)
         {
             topRightNeighbor = (*grid)[gridPos.y - 1][gridPos.x + 1];
-            nextTopRightNeighbor = (*nextGrid)[gridPos.y - 1][gridPos.x + 1];
         }
     }
 
     if (gridPos.y < (*grid).size() - 1)
     {
         bottomNeighbor = (*grid)[gridPos.y + 1][gridPos.x];
-        nextBottomNeighbor = (*nextGrid)[gridPos.y + 1][gridPos.x];
 
         if (gridPos.x > 0)
         {
             bottomLeftNeighbor = (*grid)[gridPos.y + 1][gridPos.x - 1];
-            nextBottomLeftNeighbor = (*nextGrid)[gridPos.y + 1][gridPos.x - 1];
         }
 
         if (gridPos.x < (*grid)[gridPos.y].size() - 1)
         {
             bottomRightNeighbor = (*grid)[gridPos.y + 1][gridPos.x + 1];
-            nextBottomRightNeighbor = (*nextGrid)[gridPos.y + 1][gridPos.x + 1];
         }
     }
 
     if (gridPos.x > 0)
     {
         leftNeighbor = (*grid)[gridPos.y][gridPos.x - 1];
-        nextLeftNeighbor = (*nextGrid)[gridPos.y][gridPos.x - 1];
     }
 
     if (gridPos.x < (*grid)[gridPos.y].size() - 1)
     {
         rightNeighbor = (*grid)[gridPos.y][gridPos.x + 1];
-        nextRightNeighbor = (*nextGrid)[gridPos.y][gridPos.x + 1];
     }
 
     /////////////////////////////////////////
@@ -208,140 +201,52 @@ void Cell::step(bool printThoughts)
     int gridLeft = 0;
     int gridRight = (*grid)[gridPos.y].size() - 1;
 
+    int x = gridPos.x;
+    int y = gridPos.y;
+
     if (type == "sand")
     {
-        (*nextGrid)[gridPos.y][gridPos.x] = (*grid)[gridPos.y][gridPos.x];
+        if (y < gridBottom)
+        {
+            if (bottomNeighbor == nullptr)
+            {
+                moveCell(0, 1);
+            }
+            else
+            {
+                if (bottomLeftNeighbor == nullptr && x > gridLeft && bottomRightNeighbor == nullptr && x < gridRight)
+                {
+                    if (getRandomInt(1) == 0)
+                    {
+                        moveCell(-1, 1);
+                    }
+                    else
+                    {
+                        moveCell(1, 1);
+                    }
+                }
+                else
+                {
+                    if (bottomLeftNeighbor == nullptr && x > gridLeft)
+                    {
+                        moveCell(-1, 1);
+                    }
+                    else if (bottomRightNeighbor == nullptr && x < gridRight)
+                    {
+                        moveCell(1, 1);
+                    }
+                }
+            }
+        }
+        else
+        {
+            falling = false;
+        }
     }
     else if (type == "water")
     {
-        (*nextGrid)[gridPos.y][gridPos.x] = (*grid)[gridPos.y][gridPos.x];
+        
     }
-
-    // if (type == "sand")
-    // {
-    //     bool stayStill = false;
-
-    //     if (gridPos.y < (*grid).size() - 1)
-    //     {
-    //         if (bottomNeighbor == nullptr)
-    //         {
-    //             if ((*nextGrid)[gridPos.y + 1][gridPos.x].get() == nullptr)
-    //             {
-    //                 //std::cout << gridPos.x << ", " << gridPos.y << " is going down...\n";
-    //                 moveCell(0, 1);
-    //                 falling = true;
-    //             }
-    //             else
-    //             {
-    //                 stayStill = true;
-    //                 falling = false;
-    //             }
-    //         }
-    //         else if (bottomNeighbor.get()->isFalling())
-    //         {
-    //             //std::cout << gridPos.x << ", " << gridPos.y << " is waiting...\n";
-    //             stayStill = true;
-    //             falling = true;
-    //         }
-    //         else if (bottomNeighbor.get()->getType() == "water")
-    //         {
-    //             bottomNeighbor.get()->moveCell(0, -1);
-    //             moveCell(0, 1);
-    //         }
-    //         else if (bottomLeftNeighbor == nullptr && gridPos.x > 0 && (*nextGrid)[gridPos.y + 1][gridPos.x - 1].get() == nullptr)
-    //         {
-    //             //std::cout << gridPos.x << ", " << gridPos.y << " is going down-left...\n";
-    //             moveCell(-1, 1);
-    //             falling = true;
-    //         }
-    //         else if (bottomRightNeighbor == nullptr && gridPos.x < (*grid)[gridPos.y].size() - 1 && (*nextGrid)[gridPos.y + 1][gridPos.x + 1].get() == nullptr)
-    //         {
-    //             //std::cout << gridPos.x << ", " << gridPos.y << " is going down-right...\n";
-    //             moveCell(1, 1);
-    //             falling = true;
-    //         }
-    //         else
-    //         {
-    //             stayStill = true;
-    //             falling = false;
-    //         }
-    //     }
-    //     else 
-    //     {
-    //         stayStill = true;
-    //         falling = false;
-    //     }
-
-    //     if (stayStill)
-    //     {
-    //         //std::cout << gridPos.x << ", " << gridPos.y << " is not falling...\n";
-    //         lastGridPos = gridPos;
-    //         (*nextGrid)[gridPos.y][gridPos.x] = (*grid)[gridPos.y][gridPos.x];
-    //     }
-    // }
-    // else if (type == "water")
-    // {
-    //     bool stayStill = false;
-
-    //     if (gridPos.y < (*grid).size() - 1)
-    //     {
-    //         if (bottomNeighbor == nullptr)
-    //         {
-    //             if ((*nextGrid)[gridPos.y + 1][gridPos.x].get() == nullptr)
-    //             {
-    //                 //std::cout << gridPos.x << ", " << gridPos.y << " is going down...\n";
-    //                 moveCell(0, 1);
-    //                 falling = true;
-    //             }
-    //             else
-    //             {
-    //                 stayStill = true;
-    //                 falling = false;
-    //             }
-    //         }
-    //         else if (bottomNeighbor.get()->isFalling())
-    //         {
-    //             //std::cout << gridPos.x << ", " << gridPos.y << " is waiting...\n";
-    //             stayStill = true;
-    //             falling = true;
-    //         }
-    //         else if (bottomLeftNeighbor == nullptr && gridPos.x > 0 && (*nextGrid)[gridPos.y + 1][gridPos.x - 1].get() == nullptr)
-    //         {
-    //             //std::cout << gridPos.x << ", " << gridPos.y << " is going down-left...\n";
-    //             moveCell(-1, 1);
-    //             falling = true;
-    //         }
-    //         else if (bottomRightNeighbor == nullptr && gridPos.x < (*grid)[gridPos.y].size() - 1 && (*nextGrid)[gridPos.y + 1][gridPos.x + 1].get() == nullptr)
-    //         {
-    //             //std::cout << gridPos.x << ", " << gridPos.y << " is going down-right...\n";
-    //             moveCell(1, 1);
-    //             falling = true;
-    //         }
-    //         else if (leftNeighbor == nullptr && gridPos.x > 0 && (*nextGrid)[gridPos.y][gridPos.x - 1].get() == nullptr)
-    //         {
-    //             //std::cout << gridPos.x << ", " << gridPos.y << " is going left...\n";
-    //             moveCell(-1, 0);
-    //             falling = true;
-    //         }
-    //         else
-    //         {
-    //             stayStill = true;
-    //             falling = false;
-    //         }
-    //     }
-    //     else 
-    //     {
-    //         stayStill = true;
-    //         falling = false;
-    //     }
-
-    //     if (stayStill)
-    //     {
-    //         //std::cout << gridPos.x << ", " << gridPos.y << " is not falling...\n";
-    //         lastGridPos = gridPos;
-    //         (*nextGrid)[gridPos.y][gridPos.x] = (*grid)[gridPos.y][gridPos.x];
-    //     }
-    // }
 }
 
 sf::Vector2i Cell::getGridPos()

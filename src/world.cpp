@@ -11,19 +11,17 @@ void World::create(sf::RenderWindow& window)
 {
     this->window = &window;
 
-    int gridLength = 100;
-    int gridHeight = 100;
+    int gridLength = 250;
+    int gridHeight = 250;
 
     grid.resize(gridHeight);
-    nextGrid.resize(gridHeight);
 
     for (int i = 0; i < grid.size(); i++)
     {
         grid[i].resize(gridLength);
-        nextGrid[i].resize(gridLength);
     }
     
-    cellManager.create(&grid, &nextGrid, &vertices);
+    cellManager.create(&grid, &vertices);
     
     cellManager.cellSize = (float)window.getSize().y / (float)grid.size();
 
@@ -49,7 +47,7 @@ void World::update()
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl))
         {
-            createCellCircleFromClick(10);
+            createCellCircleFromClick(10, 5);
         }
     }
 
@@ -78,7 +76,11 @@ void World::step()
     {
         for (int x = grid[y].size() - 1; x >= 0; x--)
         {
-            if (grid[y][x] != nullptr)
+            int appliedX;
+
+            (getRandomInt(1) == 0) ? appliedX = (grid[y].size() - 1) - x : appliedX = x;
+            
+            if (grid[y][appliedX] != nullptr)
             {
                 bool printThoughts = false;
 
@@ -87,22 +89,10 @@ void World::step()
                 //     printThoughts = true;
                 // }
 
-                grid[y][x]->step(printThoughts);
+                grid[y][appliedX]->step(printThoughts);
             }
         }
     }
-
-    for (int y = grid.size() - 1; y >= 0; y--)
-    {
-        for (int x = grid[y].size() - 1; x >= 0; x--)
-        {
-            if (grid[y][x] != nullptr || nextGrid[y][x] != nullptr)
-            {
-                grid[y][x] = std::move(nextGrid[y][x]);
-            }
-        }
-    }
-
 }
 
 void World::createCellFromClick()
@@ -120,7 +110,7 @@ void World::createCellFromClick()
     }
 }
 
-void World::createCellCircleFromClick(int radius)
+void World::createCellCircleFromClick(int radius, int chanceOfCreation)
 {
     std::vector<sf::Vector2i> cellsToMake = getMouseGridPositionsFromRadius(radius);
 
@@ -128,7 +118,7 @@ void World::createCellCircleFromClick(int radius)
     {
         if (cellsToMake[i].x >= 0 && cellsToMake[i].x < grid[0].size() && cellsToMake[i].y >= 0 && cellsToMake[i].y < grid.size())
         {
-            if (grid[cellsToMake[i].y][cellsToMake[i].x] == nullptr)
+            if (grid[cellsToMake[i].y][cellsToMake[i].x] == nullptr && getRandomInt(100) <= chanceOfCreation)
             {
                 sf::Vector2f cellPosition = {(float)(cellsToMake[i].x * cellManager.cellSize), (float)(cellsToMake[i].y * cellManager.cellSize)};
             

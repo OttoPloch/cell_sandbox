@@ -4,7 +4,7 @@ Game::Game() {}
 
 void Game::start()
 {
-    window = sf::RenderWindow(sf::VideoMode({1000, 1000}), "Sandbox");
+    window = sf::RenderWindow(sf::VideoMode({800, 800}), "Sandbox");
     window.setFramerateLimit(60);
 
     dtClock.start();
@@ -58,6 +58,10 @@ void Game::run()
                     {
                         paused = !paused;
                     }
+                    if (keyPressed->code == sf::Keyboard::Key::Enter)
+                    {
+                        world.createCellCircleFromClick(10, 5);
+                    }
                 }
             }
         }
@@ -75,7 +79,7 @@ void Game::run()
         {
             //std::cout << "FPS: " << FPS << "; frame time: " << dt * 1000 << "ms; highest frame time: " << highestFrameTime << "ms\n";
 
-            //std::cout << "cells created: " << world.getCellsCreated() << "; current cells: " << world.getCellCount() << '\n';
+            std::cout << "cells created: " << world.getCellsCreated() << "; current cells: " << world.getCellCount() << '\n';
 
             ticksToProcess += (dt * 1000) / 20;
     

@@ -27,7 +27,9 @@ public:
     
     void createCellFromClick();
 
-    void createCellCircleFromClick(int radius);
+    // chanceOfCreation is the x/100 chance that a
+    // cell in a spot in the radius will be created
+    void createCellCircleFromClick(int radius, int chanceOfCreation);
 
     int getCellCount();
 
@@ -40,8 +42,6 @@ private:
     sf::RenderWindow* window;
 
     std::vector<std::vector<std::shared_ptr<Cell>>> grid;
-
-    std::vector<std::vector<std::shared_ptr<Cell>>> nextGrid;
 
     std::vector<sf::Vertex> vertices;
 

@@ -37,8 +37,6 @@ private:
 
     std::vector<std::vector<std::shared_ptr<Cell>>>* grid;
 
-    std::vector<std::vector<std::shared_ptr<Cell>>>* nextGrid;
-
     std::vector<sf::Vertex>* vertices;
 
     sf::Vector2f cellPosition;
