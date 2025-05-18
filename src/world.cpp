@@ -43,11 +43,18 @@ void World::update()
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift))
         {
-            createCellFromClick();
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl))
+            {
+                createCellSquareFromClick(2, 100);
+            }
+            else
+            {
+                createCellFromClick();
+            }
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl))
         {
-            createCellCircleFromClick(10, 5);
+            createCellCircleFromClick(10, 10);
         }
     }
 
@@ -128,6 +135,24 @@ void World::createCellCircleFromClick(int radius, int chanceOfCreation)
     }
 }
 
+void World::createCellSquareFromClick(int length, int chanceOfCreation)
+{
+    std::vector<sf::Vector2i> cellsToMake = getMouseGridPositionsFromSquare(length);
+
+    for (int i = 0; i < cellsToMake.size(); i++)
+    {
+        if (cellsToMake[i].x >= 0 && cellsToMake[i].x < grid[0].size() && cellsToMake[i].y >= 0 && cellsToMake[i].y < grid.size())
+        {
+            if (grid[cellsToMake[i].y][cellsToMake[i].x] == nullptr && getRandomInt(100) <= chanceOfCreation)
+            {
+                sf::Vector2f cellPosition = {(float)(cellsToMake[i].x * cellManager.cellSize), (float)(cellsToMake[i].y * cellManager.cellSize)};
+
+                createCell(cellsToMake[i], cellPosition, cellCreationType);
+            }
+        }
+    }
+}
+
 void World::createCell(sf::Vector2i gridPos, sf::Vector2f cellPosition, std::string type)
 {
     grid[gridPos.y][gridPos.x] = std::make_shared<Cell>(&cellManager, cellPosition, gridPos, type);
@@ -168,6 +193,31 @@ std::vector<sf::Vector2i> World::getMouseGridPositionsFromRadius(int radius)
     }
 
     return pointsInRadius;
+}
+
+std::vector<sf::Vector2i> World::getMouseGridPositionsFromSquare(int length)
+{
+    std::vector<sf::Vector2i> pointsInSquare;
+
+    sf::Vector2i mouseGridPos = getMouseGridPosition();
+
+    int centerX = mouseGridPos.x;
+    int centerY = mouseGridPos.y;
+
+    int xStart = centerX - length;
+    int xEnd = centerX + length;
+    int yStart = centerY - length;
+    int yEnd = centerY + length;
+
+    for (int x = xStart; x <= xEnd; x++)
+    {
+        for (int y = yStart; y <= yEnd; y++)
+        {
+            pointsInSquare.push_back({x, y});
+        }
+    }
+
+    return pointsInSquare;
 }
 
 int World::getCellCount()

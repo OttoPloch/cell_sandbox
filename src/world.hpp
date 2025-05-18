@@ -24,12 +24,18 @@ public:
     sf::Vector2i getMouseGridPosition();
 
     std::vector<sf::Vector2i> getMouseGridPositionsFromRadius(int radius);
+
+    std::vector<sf::Vector2i> getMouseGridPositionsFromSquare(int length);
     
     void createCellFromClick();
 
     // chanceOfCreation is the x/100 chance that a
     // cell in a spot in the radius will be created
     void createCellCircleFromClick(int radius, int chanceOfCreation);
+
+    // chanceOfCreation is the x/100 chance that a
+    // cell in a spot in the radius will be created
+    void createCellSquareFromClick(int length, int chanceOfCreation);
 
     int getCellCount();
 
