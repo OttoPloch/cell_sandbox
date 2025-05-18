@@ -11,8 +11,8 @@ void World::create(sf::RenderWindow& window)
 {
     this->window = &window;
 
-    int gridLength = 250;
-    int gridHeight = 250;
+    int gridLength = 100;
+    int gridHeight = 100;
 
     grid.resize(gridHeight);
 
@@ -27,7 +27,9 @@ void World::create(sf::RenderWindow& window)
 
     cellsCreated = 0;
 
-    cellCreationType = "sand";
+    toolIndex = 0;
+    
+    cellCreationType = cellManager.types[toolIndex];
 
     // for (int j = 0; j < gridLength; j++)
     // {
@@ -245,18 +247,9 @@ int World::getCellsCreated()
 
 void World::cycleTool()
 {
-    if (cellCreationType == "sand")
-    {
-        cellCreationType = "water";
-    }
-    else if (cellCreationType == "water")
-    {
-        cellCreationType = "wood";
-    }
-    else
-    {
-        cellCreationType = "sand";
-    }
+    (toolIndex >= cellManager.types.size() - 1) ? toolIndex = 0 : toolIndex++;
+
+    cellCreationType = cellManager.types[toolIndex];
 
     std::cout << "new tool: " << cellCreationType << '\n';
 }
@@ -264,6 +257,8 @@ void World::cycleTool()
 void World::setTool(std::string tool)
 {  
     cellCreationType = tool;
+
+    toolIndex = std::distance(cellManager.types.begin(), std::find(cellManager.types.begin(), cellManager.types.end(), cellCreationType));
 
     std::cout << "new tool: " << cellCreationType << '\n';
 }

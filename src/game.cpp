@@ -4,7 +4,7 @@ Game::Game() {}
 
 void Game::start()
 {
-    window = sf::RenderWindow(sf::VideoMode({800, 800}), "Sandbox");
+    window = sf::RenderWindow(sf::VideoMode({1000, 1000}), "Sandbox");
     window.setFramerateLimit(60);
 
     dtClock.start();
@@ -61,6 +61,7 @@ void Game::run()
                     if (keyPressed->code == sf::Keyboard::Key::Enter)
                     {
                         world.createCellCircleFromClick(30, 85);
+                        world.setTool("water");
                     }
                 }
             }
@@ -81,7 +82,7 @@ void Game::run()
 
             //std::cout << "cells created: " << world.getCellsCreated() << "; current cells: " << world.getCellCount() << '\n';
 
-            ticksToProcess += (dt * 1000) / 16.666;
+            ticksToProcess += (dt * 1000) / (100.f / 6.f);
     
             while (ticksToProcess >= 1.f)
             {

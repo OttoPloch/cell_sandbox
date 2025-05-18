@@ -20,7 +20,13 @@ public:
 
     std::vector<sf::Vertex>* vertices;
 
+    std::vector<std::string> types;
+
     float cellSize;
 
     int cellColorVariance;
+
+    // x/100 chance of wood burning from
+    // fire in a step;
+    int woodBurnChance;
 };

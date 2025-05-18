@@ -15,7 +15,16 @@ void CellManager::create(std::vector<std::vector<std::shared_ptr<Cell>>>* grid, 
 
     this->vertices = vertices;
 
+    types = {
+        "sand",
+        "water",
+        "wood",
+        "fire"
+    };
+
     cellSize = 10;
 
-    cellColorVariance = 10;
+    cellColorVariance = 50;
+
+    woodBurnChance = 0;
 }

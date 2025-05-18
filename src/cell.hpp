@@ -32,6 +32,8 @@ public:
     sf::Vector2f getCellPosition();
 
     std::string getType();
+
+    void changeType(std::string newType);
 private:
     CellManager* cellManager;
 
@@ -51,7 +53,11 @@ private:
 
     void createVertices();
 
-    void setVerticesPositions(std::array<sf::Vertex, 6>& verticesToChange);
+    std::array<sf::Vertex, 6> setColor(std::array<sf::Vertex, 6>& vertices);
 
-    void changeVerticesPositions(std::array<sf::Vertex*, 6>& verticesToChange);
+    std::array<sf::Vertex*, 6> changeColor(std::array<sf::Vertex*, 6>& vertices);
+    
+    std::array<sf::Vertex, 6> setVerticesPositions(std::array<sf::Vertex, 6>& verticesToChange);
+    
+    std::array<sf::Vertex*, 6> changeVerticesPositions(std::array<sf::Vertex*, 6>& verticesToChange);
 };

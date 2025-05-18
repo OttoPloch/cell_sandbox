@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <memory>
+#include <algorithm>
 #include <iostream>
 #include <tgmath.h>
 #include "cell_manager.hpp"
@@ -53,6 +54,8 @@ private:
 
     CellManager cellManager;
 
+    int toolIndex;
+    
     std::string cellCreationType;
 
     int cellsCreated;

@@ -34,6 +34,13 @@ void Cell::createVertices()
 
     setVerticesPositions(newVertices);
 
+    setColor(newVertices);
+
+    vertices->insert(vertices->end(), &newVertices[0], &newVertices[newVertices.size()]);
+}
+
+std::array<sf::Vertex, 6> Cell::setColor(std::array<sf::Vertex, 6>& vertices)
+{
     sf::Color myColor;
     
     if (type == "sand")
@@ -48,20 +55,28 @@ void Cell::createVertices()
     {
         myColor = sf::Color(102, 69, 24);
     }
+    else if (type == "fire")
+    {
+        myColor = sf::Color(227, 19, 0);
+    }
 
-    int random = getRandomInt(cellManager->cellColorVariance);
+    int random = getRandomBalancedInt(cellManager->cellColorVariance);
 
     int red = myColor.r;
     int green = myColor.g;
     int blue = myColor.b;
 
-    red -= random;
-    green -= random;
-    blue -= random;
+    red += random;
+    green += random;
+    blue += random;
 
     if (red < 0) red = 0;
     if (green < 0) green = 0;
     if (blue < 0) blue = 0;
+
+    if (red > 255) red = 255;
+    if (green > 255) green = 255;
+    if (blue > 255) blue = 255;
 
     myColor.r = red;
     myColor.g = green;
@@ -69,13 +84,64 @@ void Cell::createVertices()
 
     for (int i = 0; i < 6; i++)
     {
-        newVertices[i].color = myColor;
+        vertices[i].color = myColor;
     }
 
-    vertices->insert(vertices->end(), &newVertices[0], &newVertices[newVertices.size()]);
+    return vertices;
 }
 
-void Cell::setVerticesPositions(std::array<sf::Vertex, 6>& verticesToChange)
+std::array<sf::Vertex*, 6> Cell::changeColor(std::array<sf::Vertex*, 6>& vertices)
+{
+    sf::Color myColor;
+    
+    if (type == "sand")
+    {
+        myColor = sf::Color(252, 191, 98);
+    }
+    else if (type == "water")
+    {
+        myColor = sf::Color(19, 94, 186);
+    }
+    else if (type == "wood")
+    {
+        myColor = sf::Color(102, 69, 24);
+    }
+    else if (type == "fire")
+    {
+        myColor = sf::Color(227, 19, 0);
+    }
+
+    int random = getRandomBalancedInt(cellManager->cellColorVariance);
+
+    int red = myColor.r;
+    int green = myColor.g;
+    int blue = myColor.b;
+
+    red += random;
+    green += random;
+    blue += random;
+
+    if (red < 0) red = 0;
+    if (green < 0) green = 0;
+    if (blue < 0) blue = 0;
+
+    if (red > 255) red = 255;
+    if (green > 255) green = 255;
+    if (blue > 255) blue = 255;
+
+    myColor.r = red;
+    myColor.g = green;
+    myColor.b = blue;
+
+    for (int i = 0; i < 6; i++)
+    {
+        vertices[i]->color = myColor;
+    }
+
+    return vertices;
+}
+
+std::array<sf::Vertex, 6> Cell::setVerticesPositions(std::array<sf::Vertex, 6>& verticesToChange)
 {
     verticesToChange[0].position = {cellPosition.x, cellPosition.y};
     verticesToChange[1].position = {cellPosition.x + cellSize, cellPosition.y};
@@ -83,9 +149,11 @@ void Cell::setVerticesPositions(std::array<sf::Vertex, 6>& verticesToChange)
     verticesToChange[3].position = verticesToChange[2].position;
     verticesToChange[4].position = verticesToChange[1].position;
     verticesToChange[5].position = {cellPosition.x + cellSize, cellPosition.y + cellSize};
+
+    return verticesToChange;
 }
 
-void Cell::changeVerticesPositions(std::array<sf::Vertex*, 6>& verticesToChange)
+std::array<sf::Vertex*, 6> Cell::changeVerticesPositions(std::array<sf::Vertex*, 6>& verticesToChange)
 {
     verticesToChange[0]->position = {cellPosition.x, cellPosition.y};
     verticesToChange[1]->position = {cellPosition.x + cellSize, cellPosition.y};
@@ -93,6 +161,22 @@ void Cell::changeVerticesPositions(std::array<sf::Vertex*, 6>& verticesToChange)
     verticesToChange[3]->position = verticesToChange[2]->position;
     verticesToChange[4]->position = verticesToChange[1]->position;
     verticesToChange[5]->position = {cellPosition.x + cellSize, cellPosition.y + cellSize};
+
+    return verticesToChange;
+}
+
+void Cell::changeType(std::string newType)
+{
+    type = newType;
+
+    std::array<sf::Vertex*, 6> verticesToChange;
+
+    for (int i = 0; i < verticesToChange.size(); i++)
+    {
+        verticesToChange[i] = &(*vertices)[verticesIndex + i];
+    }
+
+    changeColor(verticesToChange);
 }
 
 void Cell::moveCell(sf::Vector2i newGridPos)
@@ -222,6 +306,17 @@ void Cell::step(bool printThoughts)
     {
         rightNeighbor = (*grid)[gridPos.y][gridPos.x + 1];
     }
+
+    std::array<std::shared_ptr<Cell>, 8> neighbors = {
+        topLeftNeighbor,
+        topNeighbor,
+        topRightNeighbor,
+        leftNeighbor,
+        rightNeighbor,
+        bottomLeftNeighbor,
+        bottomNeighbor,
+        bottomRightNeighbor
+    };
 
     /////////////////////////////////////////
 
@@ -374,6 +469,35 @@ void Cell::step(bool printThoughts)
     else if (type == "wood")
     {
 
+    }
+    else if (type == "fire")
+    {
+        for (int i = 0; i < neighbors.size(); i++)
+        {
+            if (neighbors[i] != nullptr)
+            {
+                if (neighbors[i]->getType() == "wood")
+                {
+                    if (getRandomInt(100) <= cellManager->woodBurnChance)
+                    {
+                        neighbors[i]->changeType("fire");
+                    }
+                }
+            }
+        }
+
+        if (y > gridTop)
+        {
+            if (topNeighbor == nullptr)
+            {
+                moveCell(0, -1);
+            }
+        }
+
+        // if (getRandomInt(100) <= 0)
+        // {
+        //     changeType("water");
+        // }
     }
 }
 
