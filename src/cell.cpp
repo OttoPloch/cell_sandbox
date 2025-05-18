@@ -309,10 +309,6 @@ void Cell::step(bool printThoughts)
                                 swap(bottomRightNeighbor->getGridPos());
                             }
                         }
-                        else
-                        {
-
-                        }
                     }
                 }
             }
