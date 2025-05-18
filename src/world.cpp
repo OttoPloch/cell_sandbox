@@ -11,20 +11,21 @@ void World::create(sf::RenderWindow& window)
 {
     this->window = &window;
 
-    int gridSize = 500;
+    int gridLength = 500;
+    int gridHeight = 500;
 
-    grid.resize(gridSize);
-    nextGrid.resize(gridSize);
+    grid.resize(gridHeight);
+    nextGrid.resize(gridHeight);
 
     for (int i = 0; i < grid.size(); i++)
     {
-        grid[i].resize(gridSize);
-        nextGrid[i].resize(gridSize);
+        grid[i].resize(gridLength);
+        nextGrid[i].resize(gridLength);
     }
     
     cellManager.create(&grid, &nextGrid, &vertices);
     
-    cellManager.cellSize = window.getSize().y / grid.size();
+    cellManager.cellSize = (float)window.getSize().y / (float)grid.size();
 
     // for (int j = 0; j < gridSize; j++)
     // {
@@ -132,7 +133,7 @@ sf::Vector2i World::getMouseGridPosition()
 {
     sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
 
-    return {(int)((mousePos.x - (mousePos.x % cellManager.cellSize)) / cellManager.cellSize), (int)((mousePos.y - (mousePos.y % cellManager.cellSize)) / cellManager.cellSize)};
+    return {(int)((mousePos.x - (fmod(mousePos.x, cellManager.cellSize))) / cellManager.cellSize), (int)((mousePos.y - (fmod(mousePos.y, cellManager.cellSize))) / cellManager.cellSize)};
 }
 
 std::vector<sf::Vector2i> World::getMouseGridPositionsFromRadius(int radius)

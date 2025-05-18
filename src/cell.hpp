@@ -49,7 +49,7 @@ private:
 
     bool falling;
 
-    int cellSize;
+    float cellSize;
 
     unsigned int verticesIndex;
 
