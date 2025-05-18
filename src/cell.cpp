@@ -21,8 +21,6 @@ void Cell::create(CellManager* cellManager, sf::Vector2f cellPosition, sf::Vecto
 
     this->type = type;
 
-    falling = true;
-
     this->cellSize = cellManager->cellSize;
 
     createVertices();
@@ -122,8 +120,6 @@ void Cell::moveCell(sf::Vector2i newGridPos)
 
 void Cell::moveCell(int xChange, int yChange)
 {
-    std::cout << "next grid pos is " << gridPos.x + xChange << ", " << gridPos.y + yChange << '\n';
-
     // moves cell to new grid spot
     (*grid)[gridPos.y + yChange][gridPos.x + xChange] = std::move((*grid)[gridPos.y][gridPos.x]);
 
@@ -272,8 +268,10 @@ void Cell::step(bool printThoughts)
                     {
                         moveCell(1, 1);
                     }
-                    else if (bottomLeftNeighbor->getType() == "water" && x > gridLeft && bottomRightNeighbor->getType() == "water" && x < gridRight)
+                    else if (bottomLeftNeighbor != nullptr && bottomRightNeighbor != nullptr)
                     {
+                        if (bottomLeftNeighbor->getType() == "water" && x > gridLeft && bottomRightNeighbor->getType() == "water" && x < gridRight)
+                        {
                         if (getRandomInt(1) == 0)
                         {
                             swap(bottomLeftNeighbor->getGridPos());
@@ -282,24 +280,42 @@ void Cell::step(bool printThoughts)
                         {
                             swap(bottomRightNeighbor->getGridPos());
                         }
+                        }
+                        else
+                        {
+                            if (bottomLeftNeighbor->getType() == "water" && x > gridLeft)
+                            {
+                                swap(bottomLeftNeighbor->getGridPos());
+                            }
+                            else if (bottomRightNeighbor->getType() == "water" && x < gridRight)
+                            {
+                                swap(bottomRightNeighbor->getGridPos());
+                            }
+                        }
                     }
                     else
                     {
-                        if (bottomLeftNeighbor->getType() == "water" && x > gridLeft)
+                        if (bottomLeftNeighbor != nullptr)
                         {
-                            swap(bottomLeftNeighbor->getGridPos());
+                            if (bottomLeftNeighbor->getType() == "water" && x > gridLeft)
+                            {
+                                swap(bottomLeftNeighbor->getGridPos());
+                            }
                         }
-                        else if (bottomRightNeighbor->getType() == "water" && x < gridRight)
+                        else if (bottomRightNeighbor != nullptr)
                         {
-                            swap(bottomRightNeighbor->getGridPos());
+                            if (bottomRightNeighbor->getType() == "water" && x < gridRight)
+                            {
+                                swap(bottomRightNeighbor->getGridPos());
+                            }
+                        }
+                        else
+                        {
+
                         }
                     }
                 }
             }
-        }
-        else
-        {
-            falling = false;
         }
     }
     else if (type == "water")
@@ -358,10 +374,6 @@ void Cell::step(bool printThoughts)
                 }
             }
         }
-        else
-        {
-            falling = false;
-        }
     }
     else if (type == "wood")
     {
@@ -377,11 +389,6 @@ sf::Vector2i Cell::getGridPos()
 sf::Vector2f Cell::getCellPosition()
 {
     return cellPosition;
-}
-
-bool Cell::isFalling()
-{
-    return falling;
 }
 
 std::string Cell::getType()

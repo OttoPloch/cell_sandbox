@@ -31,8 +31,6 @@ public:
 
     sf::Vector2f getCellPosition();
 
-    bool isFalling();
-
     std::string getType();
 private:
     CellManager* cellManager;
@@ -44,8 +42,6 @@ private:
     sf::Vector2f cellPosition;
 
     sf::Vector2i gridPos;
-
-    bool falling;
 
     float cellSize;
 
