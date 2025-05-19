@@ -19,12 +19,13 @@ void CellManager::create(std::vector<std::vector<std::shared_ptr<Cell>>>* grid, 
         "sand",
         "water",
         "wood",
-        "fire"
+        "fire",
+        "smoke"
     };
 
     cellSize = 10;
 
-    cellColorVariance = 50;
+    cellColorVariance = 10;
 
     woodBurnChance = 0;
 }

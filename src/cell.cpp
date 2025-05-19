@@ -23,6 +23,8 @@ void Cell::create(CellManager* cellManager, sf::Vector2f cellPosition, sf::Vecto
 
     this->cellSize = cellManager->cellSize;
 
+    lifetime = 0;
+
     createVertices();
 }
 
@@ -59,25 +61,25 @@ std::array<sf::Vertex, 6> Cell::setColor(std::array<sf::Vertex, 6>& vertices)
     {
         myColor = sf::Color(227, 19, 0);
     }
+    else if (type == "smoke")
+    {
+        myColor = sf::Color(45, 45, 56);
+    }
 
-    int random = getRandomBalancedInt(cellManager->cellColorVariance);
+    int random = getRandomInt(cellManager->cellColorVariance);
 
     int red = myColor.r;
     int green = myColor.g;
     int blue = myColor.b;
 
-    red += random;
-    green += random;
-    blue += random;
+    red -= random;
+    green -= random;
+    blue -= random;
 
     if (red < 0) red = 0;
     if (green < 0) green = 0;
     if (blue < 0) blue = 0;
-
-    if (red > 255) red = 255;
-    if (green > 255) green = 255;
-    if (blue > 255) blue = 255;
-
+    
     myColor.r = red;
     myColor.g = green;
     myColor.b = blue;
@@ -110,24 +112,24 @@ std::array<sf::Vertex*, 6> Cell::changeColor(std::array<sf::Vertex*, 6>& vertice
     {
         myColor = sf::Color(227, 19, 0);
     }
+    else if (type == "smoke")
+    {
+        myColor = sf::Color(45, 45, 56);
+    }
 
-    int random = getRandomBalancedInt(cellManager->cellColorVariance);
+    int random = getRandomInt(cellManager->cellColorVariance);
 
     int red = myColor.r;
     int green = myColor.g;
     int blue = myColor.b;
 
-    red += random;
-    green += random;
-    blue += random;
+    red -= random;
+    green -= random;
+    blue -= random;
 
     if (red < 0) red = 0;
     if (green < 0) green = 0;
     if (blue < 0) blue = 0;
-
-    if (red > 255) red = 255;
-    if (green > 255) green = 255;
-    if (blue > 255) blue = 255;
 
     myColor.r = red;
     myColor.g = green;
@@ -254,6 +256,8 @@ void Cell::swap(sf::Vector2i swapPosition)
 
 void Cell::step(bool printThoughts)
 {
+    lifetime++;
+
     std::shared_ptr<Cell> topNeighbor = nullptr;
     std::shared_ptr<Cell> topLeftNeighbor = nullptr;
     std::shared_ptr<Cell> topRightNeighbor = nullptr;
@@ -483,21 +487,100 @@ void Cell::step(bool printThoughts)
                         neighbors[i]->changeType("fire");
                     }
                 }
+                else if (neighbors[i]->getType() == "water")
+                {
+                    if (getRandomInt(100) <= 50) neighbors[i]->changeType("smoke");
+
+                    changeType("smoke");
+                }
             }
         }
 
+        if (getRandomInt(10000000) <= lifetime)
+        {
+            changeType("smoke");
+        }
+    }
+    else if (type == "smoke")
+    {
         if (y > gridTop)
         {
             if (topNeighbor == nullptr)
             {
                 moveCell(0, -1);
             }
+            else if (topNeighbor->getType() == "sand" || topNeighbor->getType() == "water")
+            {
+                swap(topNeighbor->getGridPos());
+            }
+            else
+            {
+                if (topLeftNeighbor == nullptr && x > gridLeft && topRightNeighbor == nullptr && x < gridRight)
+                {
+                    if (getRandomInt(1) == 0)
+                    {
+                        moveCell(-1, -1);
+                    }
+                    else
+                    {
+                        moveCell(1, -1);
+                    }
+                }
+                else
+                {
+                    if (topLeftNeighbor == nullptr && x > gridLeft)
+                    {
+                        moveCell(-1, -1);
+                    }
+                    else if (topRightNeighbor == nullptr && x < gridRight)
+                    {
+                        moveCell(1, -1);
+                    }
+                    else if (topLeftNeighbor != nullptr && topRightNeighbor != nullptr)
+                    {
+                        if ((topLeftNeighbor->getType() == "sand" || topLeftNeighbor->getType() == "water") && x > gridLeft && (topRightNeighbor->getType() == "sand" || topRightNeighbor->getType() == "water") && x < gridRight)
+                        {
+                            if (getRandomInt(1) == 0)
+                            {
+                                swap(topLeftNeighbor->getGridPos());
+                            }
+                            else
+                            {
+                                swap(topRightNeighbor->getGridPos());
+                            }
+                        }
+                        else
+                        {
+                            if ((topLeftNeighbor->getType() == "sand" || topLeftNeighbor->getType() == "water") && x > gridLeft)
+                            {
+                                swap(topLeftNeighbor->getGridPos());
+                            }
+                            else if ((topRightNeighbor->getType() == "sand" || topRightNeighbor->getType() == "water") && x < gridRight)
+                            {
+                                swap(topRightNeighbor->getGridPos());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (topLeftNeighbor != nullptr)
+                        {
+                            if ((topLeftNeighbor->getType() == "sand" || topLeftNeighbor->getType() == "water") && x > gridLeft)
+                            {
+                                swap(topLeftNeighbor->getGridPos());
+                            }
+                        }
+                        else if (topRightNeighbor != nullptr)
+                        {
+                            if ((topRightNeighbor->getType() == "sand" || topRightNeighbor->getType() == "water") && x < gridRight)
+                            {
+                                swap(topRightNeighbor->getGridPos());
+                            }
+                        }
+                    }
+                }
+            }
         }
-
-        // if (getRandomInt(100) <= 0)
-        // {
-        //     changeType("water");
-        // }
     }
 }
 

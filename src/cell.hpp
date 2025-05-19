@@ -51,6 +51,8 @@ private:
 
     std::string type;
 
+    int lifetime;
+
     void createVertices();
 
     std::array<sf::Vertex, 6> setColor(std::array<sf::Vertex, 6>& vertices);

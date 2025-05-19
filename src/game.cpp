@@ -61,7 +61,6 @@ void Game::run()
                     if (keyPressed->code == sf::Keyboard::Key::Enter)
                     {
                         world.createCellCircleFromClick(30, 85);
-                        world.setTool("water");
                     }
                 }
             }
