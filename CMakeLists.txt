@@ -20,6 +20,7 @@ src/world.cpp
 src/cell.cpp
 src/cell_manager.cpp
 src/get_random_number.cpp
+src/get_index.cpp
 )
 
 target_compile_features(app PRIVATE cxx_std_17)

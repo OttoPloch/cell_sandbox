@@ -258,7 +258,7 @@ void World::setTool(std::string tool)
 {  
     cellCreationType = tool;
 
-    toolIndex = std::distance(cellManager.types.begin(), std::find(cellManager.types.begin(), cellManager.types.end(), cellCreationType));
+    toolIndex = getIndexOfString(cellManager.types, cellCreationType);
 
     std::cout << "new tool: " << cellCreationType << '\n';
 }

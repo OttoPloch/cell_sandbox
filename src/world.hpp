@@ -3,11 +3,11 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <memory>
-#include <algorithm>
 #include <iostream>
 #include <tgmath.h>
 #include "cell_manager.hpp"
 #include "cell.hpp"
+#include "get_index.hpp"
 
 class World
 {

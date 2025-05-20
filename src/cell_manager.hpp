@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <iostream>
+#include <map>
 
 class Cell;
 
@@ -26,7 +27,13 @@ public:
 
     int cellColorVariance;
 
-    // x/100 chance of wood burning from
-    // fire in a step;
+    std::map<std::string, std::vector<sf::Color>> cellColors;
+
+    // x/100 chance of wood burning
+    // from fire in a step
     int woodBurnChance;
+
+    // x/100 chance of fire moving to
+    // a random open spot in a step
+    int fireMoveChance;
 };

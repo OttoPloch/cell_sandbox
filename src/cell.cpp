@@ -45,26 +45,7 @@ std::array<sf::Vertex, 6> Cell::setColor(std::array<sf::Vertex, 6>& vertices)
 {
     sf::Color myColor;
     
-    if (type == "sand")
-    {
-        myColor = sf::Color(252, 191, 98);
-    }
-    else if (type == "water")
-    {
-        myColor = sf::Color(19, 94, 186);
-    }
-    else if (type == "wood")
-    {
-        myColor = sf::Color(102, 69, 24);
-    }
-    else if (type == "fire")
-    {
-        myColor = sf::Color(227, 19, 0);
-    }
-    else if (type == "smoke")
-    {
-        myColor = sf::Color(45, 45, 56);
-    }
+    myColor = cellManager->cellColors[type][getRandomInt(cellManager->cellColors[type].size() - 1)];
 
     int random = getRandomInt(cellManager->cellColorVariance);
 
@@ -96,26 +77,7 @@ std::array<sf::Vertex*, 6> Cell::changeColor(std::array<sf::Vertex*, 6>& vertice
 {
     sf::Color myColor;
     
-    if (type == "sand")
-    {
-        myColor = sf::Color(252, 191, 98);
-    }
-    else if (type == "water")
-    {
-        myColor = sf::Color(19, 94, 186);
-    }
-    else if (type == "wood")
-    {
-        myColor = sf::Color(102, 69, 24);
-    }
-    else if (type == "fire")
-    {
-        myColor = sf::Color(227, 19, 0);
-    }
-    else if (type == "smoke")
-    {
-        myColor = sf::Color(45, 45, 56);
-    }
+    myColor = cellManager->cellColors[type][getRandomInt(cellManager->cellColors[type].size() - 1)];
 
     int random = getRandomInt(cellManager->cellColorVariance);
 
@@ -494,9 +456,45 @@ void Cell::step(bool printThoughts)
                     changeType("smoke");
                 }
             }
+            else
+            {
+                if (getRandomInt(100) <= cellManager->fireMoveChance)
+                {
+                    // oof
+                    switch (i)
+                    {
+                        case 0:
+                            if (x > gridLeft && y > gridTop) moveCell(-1, -1);
+                            break;
+                        case 1:
+                            if (y > gridTop) moveCell(0, -1);
+                            break;
+                        case 2:
+                            if (x < gridRight && y > gridTop) moveCell(1, -1);
+                            break;
+                        case 3:
+                            if (x > gridLeft) moveCell(-1, 0);
+                            break;
+                        case 4:
+                            if (x < gridRight) moveCell(1, 0);
+                            break;
+                        case 5:
+                            if (x > gridLeft && y < gridBottom) moveCell(-1, 1);
+                            break;
+                        case 6:
+                            if (y < gridBottom) moveCell(0, 1);
+                            break;
+                        case 7:
+                            if (x < gridRight && y < gridBottom) moveCell(1, 1);
+                            break;
+                    }
+
+                    break;
+                }
+            }
         }
 
-        if (getRandomInt(10000000) <= lifetime)
+        if (getRandomInt(10000) <= lifetime)
         {
             changeType("smoke");
         }
