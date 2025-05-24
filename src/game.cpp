@@ -4,8 +4,10 @@ Game::Game() {}
 
 void Game::start()
 {
-    window = sf::RenderWindow(sf::VideoMode({1000, 1000}), "Sandbox");
+    window = sf::RenderWindow(sf::VideoMode({1000, 562}), "Sandbox", sf::Style::Close);
     window.setFramerateLimit(60);
+
+    isFullscreen = false;
 
     dtClock.start();
 
@@ -62,7 +64,47 @@ void Game::run()
                     {
                         world.createCellCircleFromClick(30, 85);
                     }
+                    if (keyPressed->code == sf::Keyboard::Key::Escape)
+                    {
+                        window.close();
+                    }
+                    if (keyPressed->code == sf::Keyboard::Key::Num1)
+                    {
+                        if (!isFullscreen)
+                        {
+                            window.setSize({1000, 562});
+                        }
+                    }
+                    if (keyPressed->code == sf::Keyboard::Key::Num2)
+                    {
+                        if (!isFullscreen)
+                        {
+                            window.setSize({1920, 1080});
+                        }
+                    }
+                    if (keyPressed->code == sf::Keyboard::Key::F11)
+                    {
+                        isFullscreen = !isFullscreen;
+
+                        window.close();
+
+                        if (isFullscreen)
+                        {
+                            window.create(sf::VideoMode::getDesktopMode(), "Sandbox", sf::State::Fullscreen);
+                        }
+                        else
+                        {
+                            window.create(sf::VideoMode({1920, 1080}), "Sandbox", sf::Style::Close);
+                        }
+                    }
                 }
+            }
+            else if (event->is<sf::Event::Resized>())
+            {
+                window.setView(sf::View({window.getSize().x / 2.f, window.getSize().y / 2.f}, {(float)window.getSize().x, (float)window.getSize().y}));
+                sf::Transform transform;
+                transform.translate({window.getView().getCenter().x - world.cellManager.cellSize * (world.cellManager.gridSize.x / 2.f), window.getView().getCenter().y - world.cellManager.cellSize * (world.cellManager.gridSize.y / 2.f)});
+                world.states.transform = transform;
             }
         }
 

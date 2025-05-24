@@ -29,7 +29,7 @@ void CellManager::create(std::vector<std::vector<std::shared_ptr<Cell>>>* grid, 
 
     cellColors = {
         {"sand", {sf::Color(252, 191, 98)}},
-        {"water", {sf::Color(19, 94, 186), sf::Color(24, 126, 191)}},
+        {"water", {sf::Color(19, 94, 186), sf::Color(24, 106, 191)}},
         {"wood", {sf::Color(102, 69, 24)}},
         {"fire", {sf::Color(227, 19, 0), sf::Color(255, 106, 0)}},
         {"smoke", {sf::Color(45, 45, 56)}}

@@ -20,4 +20,6 @@ private:
     World world;
 
     bool paused;
+
+    bool isFullscreen;
 };

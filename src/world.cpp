@@ -11,8 +11,8 @@ void World::create(sf::RenderWindow& window)
 {
     this->window = &window;
 
-    int gridLength = 250;
-    int gridHeight = 250;
+    int gridLength = 150;
+    int gridHeight = 150;
 
     grid.resize(gridHeight);
 
@@ -23,13 +23,18 @@ void World::create(sf::RenderWindow& window)
     
     cellManager.create(&grid, &vertices);
     
-    cellManager.cellSize = (float)window.getSize().y / (float)grid.size();
+    cellManager.gridSize = {(unsigned int)gridLength, (unsigned int)gridHeight};
+
+    //cellManager.cellSize = (float)window.getSize().y / (float)grid.size();
+    cellManager.cellSize = 3.f;
 
     cellsCreated = 0;
 
     toolIndex = 0;
     
     cellCreationType = cellManager.types[toolIndex];
+
+    states.transform.translate({window.getView().getCenter().x - cellManager.cellSize * (gridLength / 2.f), window.getView().getCenter().y - cellManager.cellSize * (gridHeight / 2.f)});
 
     // for (int j = 0; j < gridLength; j++)
     // {
@@ -60,7 +65,7 @@ void World::update()
         }
     }
 
-    window->draw(&vertices[0], vertices.size(), sf::PrimitiveType::Triangles);
+    window->draw(&vertices[0], vertices.size(), sf::PrimitiveType::Triangles, states);
 }
 
 void World::step()
@@ -165,6 +170,9 @@ void World::createCell(sf::Vector2i gridPos, sf::Vector2f cellPosition, std::str
 sf::Vector2i World::getMouseGridPosition()
 {
     sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+
+    mousePos.x -= states.transform.getMatrix()[12];
+    mousePos.y -= states.transform.getMatrix()[13];
 
     return {(int)((mousePos.x - (fmod(mousePos.x, cellManager.cellSize))) / cellManager.cellSize), (int)((mousePos.y - (fmod(mousePos.y, cellManager.cellSize))) / cellManager.cellSize)};
 }

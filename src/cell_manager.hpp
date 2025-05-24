@@ -23,6 +23,8 @@ public:
 
     std::vector<std::string> types;
 
+    sf::Vector2u gridSize;
+
     float cellSize;
 
     int cellColorVariance;

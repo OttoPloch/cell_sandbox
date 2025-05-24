@@ -12,6 +12,10 @@
 class World
 {
 public:
+    sf::RenderStates states;
+
+    CellManager cellManager;
+
     World();
 
     World(sf::RenderWindow& window);
@@ -51,8 +55,6 @@ private:
     std::vector<std::vector<std::shared_ptr<Cell>>> grid;
 
     std::vector<sf::Vertex> vertices;
-
-    CellManager cellManager;
 
     int toolIndex;
     
